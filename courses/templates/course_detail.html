@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Detail</title>
+</head>
+<body>
+    <h2>{{ course.course_code }} - {{ course.course_name }}</h2>
+    <p>{{ course.description }}</p>
+    <p>Instructor: {{ course.instructor_name }}</p>
+    <p>Capacity: {{ course.capacity }}</p>
+    <h3>Schedule</h3>
+    <ul>
+        {% for schedule in schedules %}
+            <li>{{ schedule.days }}: {{ schedule.start_time }} - {{ schedule.end_time }} (Room: {{ schedule.room_no }})</li>
+        {% endfor %}
+    </ul>
+    <form method="post" action="{% url 'add_course' course.id %}">
+        {% csrf_token %}
+        <button type="submit">Add Course</button>
+    </form>
+</body>
+</html>
