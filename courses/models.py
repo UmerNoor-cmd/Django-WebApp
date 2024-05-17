@@ -4,6 +4,16 @@ from django.contrib.auth.models import AbstractUser
 class Student(AbstractUser):
     # Extending the default User model
     email = models.EmailField(unique=True)
+    # Define custom related names for groups and user_permissions
+    groups = models.ManyToManyField('auth.Group', related_name='student_set')
+    user_permissions = models.ManyToManyField('auth.Permission', related_name='student_set')
+
+
+# Add or change related_name for groups field
+Student._meta.get_field('groups').related_name = 'student_groups'
+
+# Add or change related_name for user_permissions field
+Student._meta.get_field('user_permissions').related_name = 'student_user_permissions'
 
 class Course(models.Model):
     course_code = models.CharField(max_length=10, unique=True)
