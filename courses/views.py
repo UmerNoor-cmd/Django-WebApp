@@ -10,6 +10,12 @@ from django.contrib.auth.hashers import check_password
 from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+import matplotlib.pyplot as plt
+from django.http import HttpRequest
+from .models import Course, CourseSchedule, StudentReg
+from io import BytesIO
+import base64
 
 
 
@@ -163,7 +169,46 @@ def add_course(request):
 
 
 
+def generate_reports(request):
+    # Example report: Course Enrollment
+    courses = Course.objects.all()
+    course_names = [course.name for course in courses]
+    enrollment_counts = [StudentReg.objects.filter(course=course).count() for course in courses]
 
+    # Bar chart for Course Enrollment
+    plt.figure(figsize=(10, 5))
+    plt.bar(course_names, enrollment_counts)
+    plt.xlabel('Courses')
+    plt.ylabel('Number of Enrollments')
+    plt.title('Course Enrollment Report')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+
+    # Save bar chart to a string in PNG format
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    enrollment_image_png = buffer.getvalue()
+    buffer.close()
+    enrollment_image_base64 = base64.b64encode(enrollment_image_png).decode('utf-8')
+
+    # Pie chart for Course Popularity
+    plt.figure(figsize=(8, 8))
+    plt.pie(enrollment_counts, labels=course_names, autopct='%1.1f%%', startangle=140)
+    plt.title('Course Popularity')
+
+    # Save pie chart to a string in PNG format
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    popularity_image_png = buffer.getvalue()
+    buffer.close()
+    popularity_image_base64 = base64.b64encode(popularity_image_png).decode('utf-8')
+
+    return render(request, 'generate_reports.html', {
+        'enrollment_image_base64': enrollment_image_base64,
+        'popularity_image_base64': popularity_image_base64,
+    })
 
 
 

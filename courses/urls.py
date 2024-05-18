@@ -6,7 +6,7 @@ urlpatterns = [
     path('', views.login_or_register, name='login_or_register'),  # Add this line
     path('course_search/', views.course_search, name='course_search'),
     path('register_courses/', register_courses, name='register_courses'),
- 
+    path('generate_reports/', views.generate_reports, name='generate_reports'),  # Add this line
     path('course_detail/', views.course_detail, name='course_detail'),
     path('add_course/', add_course, name='add_course'),
     path('view_schedule/', views.view_schedule, name='view_schedule'),
