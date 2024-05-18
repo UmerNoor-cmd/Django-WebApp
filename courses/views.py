@@ -9,8 +9,13 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
 from django.db.models import Q
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
+
 
 def login_or_register(request):
+    global student_id  # Initialize student ID variable globally
+    student_id = None  # Initialize student ID variable
     form = None  # Initialize the form variable outside the conditional block
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -23,6 +28,7 @@ def login_or_register(request):
                 student = Student.objects.filter(name=name).first()
                 if student and check_password(password, student.password):
                     # Authentication successful
+                    student_id = student.student_id  # Save student ID
                     return redirect('course_search')  # Redirect to course search page after successful login
                 else:
                     error_message = "Invalid username or password"
@@ -36,34 +42,126 @@ def login_or_register(request):
                 password = form.cleaned_data['password']
                 hashed_password = make_password(password)
                 student = Student(email=email, name=name, password=hashed_password)
+                
+                # Set the default status for new students regarding prerequisites
+                # For example, here we assume new students have no prerequisites completed
+                student.has_completed_prerequisites = False
                 student.save()
+                
+                student_id = student.student_id  # Save student ID
                 return redirect('login_or_register')  # Redirect to the login page after successful registration
     else:
         form = LoginForm()  # Render login form by default
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login.html', {'form': form, 'student_id': student_id})
+
 
 
 def course_search(request):
     print("Course search view called")  # Debug statement
     query = request.GET.get('q', '')
     print(f"Search query: {query}")  # Debug statement
-    action = request.POST.get('action')
+    action = request.GET.get('action', '')  # Change POST to GET
 
     courses = Course.objects.all()
+    no_courses_message = ""  # Initialize no_courses_message as an empty string
+
+
+
+    print("The value of student_id is:", student_id)
+    # Retrieve courses registered by the student
+    student_courses = StudentReg.objects.filter(student_id=student_id).values_list('course_id', flat=True)
+
+    if not student_courses:
+        # If the student has no registered courses, set the no_courses_message flag
+        no_courses_message = "Please add a course."
+    else:
+        # Filter the courses to only include those registered by the student
+        courses = courses.filter(pk__in=student_courses)
 
     if query:
         # Filter courses by course code, course name, or instructor name
-        courses = courses.filter(
+        courses = courses.filter(   
             Q(code__icontains=query) |  # Search by course code
             Q(name__icontains=query) |  # Search by course name
             Q(instructor__icontains=query)  # Search by instructor name
         )
 
-    elif action == 'addcourse':
+    if action == 'addcourse':
+        return redirect('add_course')  # Redirect to the add_course page
 
-        return redirect('add_course')  # Redirect to the login page after successful registration
     print(f"Found courses: {courses}")  # Debug statement
-    return render(request, 'course_search.html', {'courses': courses})
+    return render(request, 'course_search.html', {'courses': courses, 'no_courses_message': no_courses_message})
+
+
+
+
+
+
+
+
+
+
+
+
+
+def add_course(request):
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        try:
+            course = Course.objects.get(course_id=course_id)
+
+            # Check if the student has any registered courses
+            student_courses = StudentReg.objects.filter(student=student_id)
+            if not student_courses:
+                # Handle the case of a new student (e.g., display a message)
+                new_student_message = "Welcome! Since you're a new student, you have no registered courses yet."
+                # Proceed with course registration for new student
+
+            # Check for availability
+            if student_courses.count() >= course.capacity:
+                return render(request, 'add_course.html', {
+                    'error': "Course is full",
+                    'courses': Course.objects.all()
+                })
+
+            # Check for schedule clash
+            student_schedules = CourseSchedule.objects.filter(course__studentreg__student=student_id)
+            if student_schedules.filter(
+                Q(days=course.schedule.days) &
+                (
+                    Q(start_time__lt=course.schedule.end_time, start_time__gte=course.schedule.start_time) |
+                    Q(end_time__lte=course.schedule.end_time, end_time__gt=course.schedule.start_time)
+                )
+            ).exists():
+                return render(request, 'add_course.html', {
+                    'error': "Schedule clash detected",
+                    'courses': Course.objects.all()
+                })
+
+            # Register the student for the course
+            StudentReg.objects.create(student_id=student_id, course=course)
+            return redirect('course_search')
+
+        except Course.DoesNotExist:
+            return render(request, 'add_course.html', {
+                'error': "Course not found",
+                'courses': Course.objects.all()
+            })
+
+    return render(request, 'add_course.html', {'courses': Course.objects.all()})
+
+
+
+
+
+
+def course_detail(request, course_id):
+    course = Course.objects.get(id=course_id)
+    schedules = CourseSchedule.objects.filter(course=course)
+    return render(request, 'course_detail.html', {'course': course, 'schedules': schedules})
+
+
+
 
 
 def register_courses(request):
@@ -92,27 +190,6 @@ def register_courses(request):
     # Redirect to the course search page if the request method is not POST
     return redirect('course_search')
 
-
-
-def add_course(request, course_id):
-    student = Student.objects.get(id=request.user.id)
-    course = Course.objects.get(id=course_id)
-
-    if request.method == 'GET':
-        # Perform the course registration logic
-        # This part is not included here for brevity
-
-        return redirect('course_search')  # Redirect to course search page after successful addition
-
-    return render(request, 'add_course.html', {'course': course})
-
-
-
-
-def course_detail(request, course_id):
-    course = Course.objects.get(id=course_id)
-    schedules = CourseSchedule.objects.filter(course=course)
-    return render(request, 'course_detail.html', {'course': course, 'schedules': schedules})
 
 # def add_course(request):
 #     if request.method == 'POST':

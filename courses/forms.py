@@ -13,3 +13,7 @@ class RegistrationForm(forms.ModelForm):
     class Meta:
         model = Student
         fields = ['name', 'email', 'password']
+
+
+class CourseAddForm(forms.Form):
+    course_id = forms.IntegerField(label='Course ID', required=True)

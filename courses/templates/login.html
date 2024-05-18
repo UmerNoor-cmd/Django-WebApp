@@ -8,6 +8,7 @@
     <form method="post" action="{% url 'login_or_register' %}">
         {% csrf_token %}
         {{ form.as_p }}
+        <input type="hidden" name="student_id" value="{{ student_id }}">  <!-- Add hidden input for student_id -->
         <button type="submit" name="action" value="login">Log In</button>
         <button type="submit" name="action" value="register">Register</button>
     </form>

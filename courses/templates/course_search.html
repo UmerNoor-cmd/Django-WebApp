@@ -11,33 +11,38 @@
     </form>
 
     <h3>Search Results</h3>
-    {% if courses %}
-        <ul>
-            {% for course in courses %}
-                <li>
-                    <strong>{{ course.name }}</strong> - {{ course.instructor }}<br>
-                    <em>Description:</em> {{ course.description }}<br>
-                    <em>Available spots:</em> {{ course.capacity }}<br>
-                    <em>Course Schedule:</em>
-                    <ul>
-                        <li>
-                            <em>Days:</em> {{ course.schedule.days }}<br>
-                            <em>Start Time:</em> {{ course.schedule.start_time }}<br>
-                            <em>End Time:</em> {{ course.schedule.end_time }}<br>
-                            <em>Room No:</em> {{ course.schedule.room_no }}
-                        </li>
-                    </ul>
-                </li>
-            {% endfor %}
-        </ul>
+    {% if no_courses_message %}
+        <p>Please add a course.</p>
     {% else %}
-        <p>No courses found.</p>
-
-    {% endif %} 
-
+        {% if courses %}
+            <ul>
+                {% for course in courses %}
+                    <li>
+                        <strong>{{ course.name }}</strong> - {{ course.instructor }}<br>
+                        <em>Description:</em> {{ course.description }}<br>
+                        <em>Available spots:</em> {{ course.capacity }}<br>
+                        <em>Course Schedule:</em>
+                        <ul>
+                            <li>
+                                <em>Days:</em> {{ course.schedule.days }}<br>
+                                <em>Start Time:</em> {{ course.schedule.start_time }}<br>
+                                <em>End Time:</em> {{ course.schedule.end_time }}<br>
+                                <em>Room No:</em> {{ course.schedule.room_no }}
+                            </li>
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No courses found.</p>
+        {% endif %}
+    {% endif %}
     
-    <form>
+    <!-- Ensure the form uses POST method -->
+    <form method="post" action="{% url 'course_search' %}?action=addcourse">
+        {% csrf_token %}
         <button type="submit" name="action" value="addcourse">Add a Course</button>
     </form>
 </body>
 </html>
+
