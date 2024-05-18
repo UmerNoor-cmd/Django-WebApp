@@ -132,8 +132,18 @@ def add_course(request):
             # Check if the student has any registered courses
             student_courses = StudentReg.objects.filter(student=student_id)
 
+            # Check if the course has prerequisites
+            if course.prerequisites:
+                # Check if the student has completed the prerequisites
+                completed_prerequisites = StudentReg.objects.filter(student=student_id, course__name=course.prerequisites).exists()
+                if not completed_prerequisites:
+                    return render(request, 'add_course.html', {
+                        'error': f"You need to complete the prerequisite course '{course.prerequisites}' first.",
+                        'courses': Course.objects.all()
+                    })
+
+            # Handle the case of a new student
             if not student_courses:
-                # Handle the case of a new student (e.g., display a message)
                 new_student_message = "Welcome! Since you're a new student, you have no registered courses yet."
                 # Proceed with course registration for new student
 
@@ -158,23 +168,6 @@ def add_course(request):
                     'courses': Course.objects.all()
                 })
 
-            # Check prerequisites if they exist
-            if course.prerequisites:
-                prerequisites = course.prerequisites.split(',')
-                for prerequisite_code in prerequisites:
-                    try:
-                        prerequisite_course = Course.objects.get(code=prerequisite_code.strip())
-                        if not StudentReg.objects.filter(student=student_id, course=prerequisite_course).exists():
-                            return render(request, 'add_course.html', {
-                                'error': f"You need to complete prerequisite course: {prerequisite_course.name}",
-                                'courses': Course.objects.all()
-                            })
-                    except Course.DoesNotExist:
-                        return render(request, 'add_course.html', {
-                            'error': f"Prerequisite course: {prerequisite_code.strip()} not found",
-                            'courses': Course.objects.all()
-                        })
-
             # Register the student for the course
             StudentReg.objects.create(student_id=student_id, course=course)
             return redirect('course_search')
@@ -186,6 +179,7 @@ def add_course(request):
             })
 
     return render(request, 'add_course.html', {'courses': Course.objects.all()})
+
 
 
 
