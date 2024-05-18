@@ -96,10 +96,20 @@ def course_search(request):
 
 
 
+def course_detail(request):
+    print("Course search view called")  # Debug statement
+    query = request.GET.get('q', '')
+    print(f"Search query: {query}")  # Debug statement
+    courses = Course.objects.all()
 
-
-
-
+    if query:
+        # Filter courses by course code, course name, or instructor name
+        courses = courses.filter(   
+            Q(code__icontains=query) |  # Search by course code
+            Q(name__icontains=query) |  # Search by course name
+            Q(instructor__icontains=query)  # Search by instructor name
+        )
+    return render(request, 'course_detail.html', {'courses': courses})
 
 
 
@@ -153,12 +163,6 @@ def add_course(request):
 
 
 
-
-
-def course_detail(request, course_id):
-    course = Course.objects.get(id=course_id)
-    schedules = CourseSchedule.objects.filter(course=course)
-    return render(request, 'course_detail.html', {'course': course, 'schedules': schedules})
 
 
 

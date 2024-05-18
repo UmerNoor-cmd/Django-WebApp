@@ -1,22 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Course Detail</title>
+    <title>Course Details</title>
 </head>
 <body>
-    <h2>{{ course.course_code }} - {{ course.course_name }}</h2>
-    <p>{{ course.description }}</p>
-    <p>Instructor: {{ course.instructor_name }}</p>
-    <p>Capacity: {{ course.capacity }}</p>
-    <h3>Schedule</h3>
+    <h2>Course Details</h2>
+    <form method="GET" action="{% url 'course_detail' %}">
+        <input type="text" name="q" placeholder="Search by course code, name, or instructor">
+        <button type="submit">Search</button>
+    </form>
     <ul>
-        {% for schedule in schedules %}
-            <li>{{ schedule.days }}: {{ schedule.start_time }} - {{ schedule.end_time }} (Room: {{ schedule.room_no }})</li>
+        {% for course in courses %}
+            <li>
+                <strong>Course Code:</strong> {{ course.code }}<br>
+                <strong>Course Name:</strong> {{ course.name }}<br>
+                <strong>Description:</strong> {{ course.description }}<br>
+                <strong>Instructor:</strong> {{ course.instructor }}<br>
+                <strong>Available spots:</strong> {{ course.capacity }}<br>
+                <strong>Course Schedule:</strong> <br>
+                <ul>
+                    <li>
+                        <em>Days:</em> {{ course.schedule.days }}<br>
+                        <em>Start Time:</em> {{ course.schedule.start_time }}<br>
+                        <em>End Time:</em> {{ course.schedule.end_time }}<br>
+                        <em>Room No:</em> {{ course.schedule.room_no }}
+                    </li>
+                </ul><br><br>
+            </li>
         {% endfor %}
     </ul>
-    <form method="post" action="{% url 'add_course' course.id %}">
-        {% csrf_token %}
-        <button type="submit">Add Course</button>
-    </form>
 </body>
 </html>
