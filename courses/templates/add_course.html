@@ -10,7 +10,6 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
-        <input type="hidden" name="student_id" value="{{ student_id }}">
         <label for="course_id">Select Course:</label>
         <select id="course_id" name="course_id" required>
             <option value="">-- Select a Course --</option>
@@ -22,5 +21,4 @@
     </form>
 </body>
 </html>
-
 
