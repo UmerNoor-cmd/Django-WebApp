@@ -4,15 +4,21 @@
     <title>Course Search</title>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Retrieve upcoming deadlines data from Django template
-            const upcomingDeadlines = JSON.parse('{{ upcoming_deadlines_json|escapejs }}');
-    
-            // Check if there are any upcoming deadlines
-            if (upcomingDeadlines.length > 0) {
-                // Iterate over each deadline and generate an alert
-                upcomingDeadlines.forEach(function(deadline) {
-                    alert('Reminder: ' + deadline.name + ' for course ' + deadline.course__name + ' is on ' + deadline.date);
-                });
+            // Check if the alert has been shown previously
+            if (!sessionStorage.getItem('alertShown')) {
+                // Retrieve upcoming deadlines data from Django template
+                const upcomingDeadlines = JSON.parse('{{ upcoming_deadlines_json|escapejs }}');
+                
+                // Check if there are any upcoming deadlines
+                if (upcomingDeadlines.length > 0) {
+                    // Iterate over each deadline and generate an alert
+                    upcomingDeadlines.forEach(function(deadline) {
+                        alert('Reminder: ' + deadline.name + ' for course ' + deadline.course__name + ' is on ' + deadline.date);
+                    });
+                    
+                    // Set a flag in sessionStorage to indicate that the alert has been shown
+                    sessionStorage.setItem('alertShown', true);
+                }
             }
         });
     </script>
