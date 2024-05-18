@@ -41,7 +41,13 @@ class Course(models.Model):
         return f"{self.code} - {self.name}"
 
 
+class Deadline(models.Model):
+    name = models.CharField(max_length=100)
+    date = models.DateField()
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"{self.name} ({self.course.code})"
 
 class StudentReg(models.Model):
     reg_id = models.AutoField(primary_key=True)

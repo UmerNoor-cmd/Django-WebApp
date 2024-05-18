@@ -13,10 +13,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import matplotlib.pyplot as plt
 from django.http import HttpRequest
-from .models import Course, CourseSchedule, StudentReg
+from .models import Course, CourseSchedule, StudentReg,Deadline
 from io import BytesIO
 import base64
-
+from django.utils import timezone
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 def login_or_register(request):
@@ -71,10 +73,11 @@ def course_search(request):
     courses = Course.objects.all()
     no_courses_message = ""  # Initialize no_courses_message as an empty string
 
+    # Fetch upcoming deadlines
+    upcoming_deadlines = Deadline.objects.filter(date__gte=timezone.now())
+    upcoming_deadlines_json = json.dumps(list(upcoming_deadlines.values('name', 'date', 'course__name')), cls=DjangoJSONEncoder)
 
-
-    print("The value of student_id is:", student_id)
-    # Retrieve courses registered by the student
+    # Add student-specific logic here if needed
     student_courses = StudentReg.objects.filter(student_id=student_id).values_list('course_id', flat=True)
 
     if not student_courses:
@@ -96,7 +99,7 @@ def course_search(request):
         return redirect('add_course')  # Redirect to the add_course page
 
     print(f"Found courses: {courses}")  # Debug statement
-    return render(request, 'course_search.html', {'courses': courses, 'no_courses_message': no_courses_message})
+    return render(request, 'course_search.html', {'courses': courses, 'no_courses_message': no_courses_message, 'upcoming_deadlines_json': upcoming_deadlines_json})
 
 
 
@@ -209,6 +212,9 @@ def generate_reports(request):
         'enrollment_image_base64': enrollment_image_base64,
         'popularity_image_base64': popularity_image_base64,
     })
+
+
+
 
 
 

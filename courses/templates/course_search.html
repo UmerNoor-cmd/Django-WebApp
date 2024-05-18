@@ -2,17 +2,31 @@
 <html>
 <head>
     <title>Course Search</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Retrieve upcoming deadlines data from Django template
+            const upcomingDeadlines = JSON.parse('{{ upcoming_deadlines_json|escapejs }}');
+    
+            // Check if there are any upcoming deadlines
+            if (upcomingDeadlines.length > 0) {
+                // Iterate over each deadline and generate an alert
+                upcomingDeadlines.forEach(function(deadline) {
+                    alert('Reminder: ' + deadline.name + ' for course ' + deadline.course__name + ' is on ' + deadline.date);
+                });
+            }
+        });
+    </script>
 </head>
 <body>
     <h2>Course Search</h2>
     <form method="GET" action="{% url 'course_search' %}">
-        <input type="text" name="q" placeholder="Search by course code, name, or instructor">
+        <input type="text" name="q" placeholder="Search by course code, name, or instructor" value="{{ request.GET.q }}">
         <button type="submit">Search</button>
     </form>
 
     <h3>Search Results</h3>
     {% if no_courses_message %}
-        <p>Please add a course.</p>
+        <p>{{ no_courses_message }}</p>
     {% else %}
         {% if courses %}
             <ul>
@@ -31,15 +45,13 @@
                             </li>
                         </ul>
                     </li>
-                    
                 {% endfor %}
             </ul>
         {% else %}
             <p>No courses found.</p>
         {% endif %}
     {% endif %}
-    
-    <!-- Ensure the form uses POST method -->
+
     <form method="post" action="{% url 'course_search' %}?action=addcourse">
         {% csrf_token %}
         <button type="submit" name="action" value="addcourse">Add a Course</button>
@@ -52,4 +64,3 @@
     </form>
 </body>
 </html>
-
