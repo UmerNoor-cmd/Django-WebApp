@@ -158,21 +158,22 @@ def add_course(request):
                     'courses': Course.objects.all()
                 })
 
-            # Check prerequisites
-            prerequisites = course.prerequisites.split(',')
-            for prerequisite_code in prerequisites:
-                try:
-                    prerequisite_course = Course.objects.get(code=prerequisite_code.strip())
-                    if not StudentReg.objects.filter(student=student_id, course=prerequisite_course).exists():
+            # Check prerequisites if they exist
+            if course.prerequisites:
+                prerequisites = course.prerequisites.split(',')
+                for prerequisite_code in prerequisites:
+                    try:
+                        prerequisite_course = Course.objects.get(code=prerequisite_code.strip())
+                        if not StudentReg.objects.filter(student=student_id, course=prerequisite_course).exists():
+                            return render(request, 'add_course.html', {
+                                'error': f"You need to complete prerequisite course: {prerequisite_course.name}",
+                                'courses': Course.objects.all()
+                            })
+                    except Course.DoesNotExist:
                         return render(request, 'add_course.html', {
-                            'error': f"You need to complete prerequisite course: {prerequisite_course.name}",
+                            'error': f"Prerequisite course: {prerequisite_code.strip()} not found",
                             'courses': Course.objects.all()
                         })
-                except Course.DoesNotExist:
-                    return render(request, 'add_course.html', {
-                        'error': f"Prerequisite course: {prerequisite_code.strip()} not found",
-                        'courses': Course.objects.all()
-                    })
 
             # Register the student for the course
             StudentReg.objects.create(student_id=student_id, course=course)
