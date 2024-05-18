@@ -1,0 +1,41 @@
+[
+    {
+        "model": "courses.course",
+        "pk": 1,
+        "fields": {
+            "code": 1,
+            "name": "Math 101",
+            "description": "Introduction to Mathematics",
+            "instructor": "Prof. Johnson",
+            "prerequisites": "",
+            "capacity": 50,
+            "schedule_id": 1
+        }
+    },
+    {
+        "model": "courses.course",
+        "pk": 2,
+        "fields": {
+            "code": 2,
+            "name": "English Composition",
+            "description": "Writing and Composition",
+            "instructor": "Prof. Smith",
+            "prerequisites": "",
+            "capacity": 40,
+            "schedule_id": 2
+        }
+    },
+    {
+        "model": "courses.course",
+        "pk": 3,
+        "fields": {
+            "code": 3,
+            "name": "Computer Science 101",
+            "description": "Introduction to Computer Science",
+            "instructor": "Prof. Lee",
+            "prerequisites": "",
+            "capacity": 60,
+            "schedule_id": 3
+        }
+    }
+]

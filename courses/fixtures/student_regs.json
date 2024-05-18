@@ -1,0 +1,26 @@
+[
+    {
+        "model": "courses.studentreg",
+        "pk": 1,
+        "fields": {
+            "student": 1,
+            "course": 1
+        }
+    },
+    {
+        "model": "courses.studentreg",
+        "pk": 2,
+        "fields": {
+            "student": 1,
+            "course": 2
+        }
+    },
+    {
+        "model": "courses.studentreg",
+        "pk": 3,
+        "fields": {
+            "student": 2,
+            "course": 3
+        }
+    }
+]

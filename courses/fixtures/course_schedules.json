@@ -1,0 +1,32 @@
+[
+    {
+        "model": "courses.courseschedule",
+        "pk": 1,
+        "fields": {
+            "days": "Monday",
+            "start_time": "08:00:00",
+            "end_time": "10:00:00",
+            "room_no": "101"
+        }
+    },
+    {
+        "model": "courses.courseschedule",
+        "pk": 2,
+        "fields": {
+            "days": "Wednesday",
+            "start_time": "10:30:00",
+            "end_time": "12:30:00",
+            "room_no": "102"
+        }
+    },
+    {
+        "model": "courses.courseschedule",
+        "pk": 3,
+        "fields": {
+            "days": "Friday",
+            "start_time": "13:00:00",
+            "end_time": "15:00:00",
+            "room_no": "103"
+        }
+    }
+]

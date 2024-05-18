@@ -1,0 +1,20 @@
+[
+    {
+        "model": "courses.student",
+        "pk": 1,
+        "fields": {
+            "name": "John Doe",
+            "password": "password1",
+            "email": "john.doe@example.com"
+        }
+    },
+    {
+        "model": "courses.student",
+        "pk": 2,
+        "fields": {
+            "name": "Jane Smith",
+            "password": "password2",
+            "email": "jane.smith@example.com"
+        }
+    }
+]

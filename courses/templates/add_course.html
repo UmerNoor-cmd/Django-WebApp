@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Course</title>
+</head>
+<body>
+    <h2>Add Course</h2>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <p>Course Name: {{ course.name }}</p>
+        <p>Description: {{ course.description }}</p>
+        <p>Instructor: {{ course.instructor }}</p>
+        <p>Available spots: {{ course.capacity }}</p>
+        <!-- Add more course details as needed -->
+        <button type="submit">Add Course</button>
+    </form>
+</body>
+</html>
