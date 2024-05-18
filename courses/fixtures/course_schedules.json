@@ -28,5 +28,37 @@
             "end_time": "15:00:00",
             "room_no": "103"
         }
+    },
+
+
+    {
+        "model": "courses.courseschedule",
+        "pk": 4,
+        "fields": {
+            "days": "Tuesday",
+            "start_time": "09:00:00",
+            "end_time": "11:00:00",
+            "room_no": "201"
+        }
+    },
+    {
+        "model": "courses.courseschedule",
+        "pk": 5,
+        "fields": {
+            "days": "Thursday",
+            "start_time": "14:00:00",
+            "end_time": "16:00:00",
+            "room_no": "202"
+        }
+    },
+    {
+        "model": "courses.courseschedule",
+        "pk": 6,
+        "fields": {
+            "days": "Saturday",
+            "start_time": "10:00:00",
+            "end_time": "12:00:00",
+            "room_no": "203"
+        }
     }
 ]

@@ -131,6 +131,7 @@ def add_course(request):
 
             # Check if the student has any registered courses
             student_courses = StudentReg.objects.filter(student=student_id)
+
             if not student_courses:
                 # Handle the case of a new student (e.g., display a message)
                 new_student_message = "Welcome! Since you're a new student, you have no registered courses yet."
@@ -156,6 +157,22 @@ def add_course(request):
                     'error': "Schedule clash detected",
                     'courses': Course.objects.all()
                 })
+
+            # Check prerequisites
+            prerequisites = course.prerequisites.split(',')
+            for prerequisite_code in prerequisites:
+                try:
+                    prerequisite_course = Course.objects.get(code=prerequisite_code.strip())
+                    if not StudentReg.objects.filter(student=student_id, course=prerequisite_course).exists():
+                        return render(request, 'add_course.html', {
+                            'error': f"You need to complete prerequisite course: {prerequisite_course.name}",
+                            'courses': Course.objects.all()
+                        })
+                except Course.DoesNotExist:
+                    return render(request, 'add_course.html', {
+                        'error': f"Prerequisite course: {prerequisite_code.strip()} not found",
+                        'courses': Course.objects.all()
+                    })
 
             # Register the student for the course
             StudentReg.objects.create(student_id=student_id, course=course)
